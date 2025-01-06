@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Diabetic Retinopathy Classification</title>
+    <link rel="stylesheet" type="text/css" href="/static/style.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('form').on('submit', function (event) {
+                event.preventDefault();
+                var formData = new FormData($('form')[0]);
+                $.ajax({
+                    url: '/predict',
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function (response) {
+                        $('#result').text('Predicted class: ' + response.class + ', Confidence: ' + response.confidence.toFixed(2));
+                    }
+                });
+            });
+
+            $('input[type="file"]').change(function (e) {
+                var file = e.target.files[0];
+                var reader = new FileReader();
+                reader.onload = function (event) {
+                    $('#image-preview').attr('src', event.target.result);
+                    $('#image-preview').show(); // Show the image preview
+                };
+                reader.readAsDataURL(file);
+            });
+        });
+    </script>
+</head>
+<body>
+    <h1>Diabetic Retinopathy Classification</h1>
+    <form id="upload-form" action="/predict" method="post" enctype="multipart/form-data">
+        <input type="file" name="file">
+        <img id="image-preview" src="" alt="Preview" style="display: none;">
+        <button type="submit">Predict</button>
+    </form>
+    <div id="result"></div>
+</body>
+</html>
+
+
